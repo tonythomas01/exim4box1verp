@@ -21,8 +21,8 @@
 # for explanation and some workarounds.
 
 system_aliases:
-  debug_print = "R: system_aliases for $local_part@$domain"
-  driver = redirect
+  debug_print = "R: system_aliases test for $local_part@$domain"
+  driver = pipe
   domains = +local_domains
   allow_fail
   allow_defer
@@ -33,11 +33,8 @@ system_aliases:
   .ifdef SYSTEM_ALIASES_GROUP
   group = SYSTEM_ALIASES_GROUP
   .endif
-  .ifdef SYSTEM_ALIASES_FILE_TRANSPORT
-  file_transport = SYSTEM_ALIASES_FILE_TRANSPORT
-  .endif
-  .ifdef SYSTEM_ALIASES_PIPE_TRANSPORT
-  pipe_transport = SYSTEM_ALIASES_PIPE_TRANSPORT
+  file_transport = address_file
+  pipe_transport = address_pipe
   .endif
   .ifdef SYSTEM_ALIASES_DIRECTORY_TRANSPORT
   directory_transport = SYSTEM_ALIASES_DIRECTORY_TRANSPORT

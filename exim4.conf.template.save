@@ -1176,12 +1176,8 @@ system_aliases:
   .ifdef SYSTEM_ALIASES_GROUP
   group = SYSTEM_ALIASES_GROUP
   .endif
-  .ifdef SYSTEM_ALIASES_FILE_TRANSPORT
-  file_transport = SYSTEM_ALIASES_FILE_TRANSPORT
-  .endif
-  .ifdef SYSTEM_ALIASES_PIPE_TRANSPORT
-  pipe_transport = SYSTEM_ALIASES_PIPE_TRANSPORT
-  .endif
+pipe_transport = address_pipe
+file_transport = address_file
   .ifdef SYSTEM_ALIASES_DIRECTORY_TRANSPORT
   directory_transport = SYSTEM_ALIASES_DIRECTORY_TRANSPORT
   .endif

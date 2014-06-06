@@ -1161,7 +1161,7 @@ real_local:
 # for explanation and some workarounds.
 
 system_aliases:
-  debug_print = "R: system_aliases for $local_part@$domain"
+  debug_print = "R: system_asliases for $local_part@$domain"
   driver = redirect
   domains = +local_domains
   allow_fail
