@@ -69,8 +69,6 @@ domainlist relay_to_domains = MAIN_RELAY_TO_DOMAINS
 
 hostlist relay_from_hosts = MAIN_RELAY_NETS
 
-domainlist wiki_domains = wikimedia.org
-
 .ifndef MAIN_PRIMARY_HOSTNAME_AS_QUALIFY_DOMAIN
 .ifndef MAIN_QUALIFY_DOMAIN
 qualify_domain = ETC_MAILNAME
@@ -521,19 +519,27 @@ real_local:
   local_part_prefix = real-
   check_local_user
   transport = LOCAL_DELIVERY
-  
-# Use the system aliasfile /etc/aliases for system domains
+
 system_aliases:
-	driver = accept
-	domains = +local_domains
-	transport = use_pipe
+  debug_print = "R: system_asliases for $local_part@$domain"
+  driver = redirect
+  domains = +local_domains
+  allow_fail
+  allow_defer
+  data = ${lookup{$local_part}lsearch{/etc/aliases}}
+  .ifdef SYSTEM_ALIASES_USER
+  user = SYSTEM_ALIASES_USER
+  .endif
+  .ifdef SYSTEM_ALIASES_GROUP
+  group = SYSTEM_ALIASES_GROUP
+  .endif
+  file_transport = address_pipe 
+  pipe_transport = address_file
+  .ifdef SYSTEM_ALIASES_DIRECTORY_TRANSPORT
+  directory_transport = SYSTEM_ALIASES_DIRECTORY_TRANSPORT
+  .endif
 
-wiki_mails:
-	driver = accept
-	domains = +wiki_domains
-	transport = wikimail_delivery
-  
-
+.ifdef DCconfig_satellite
 hub_user:
   debug_print = "R: hub_user for $local_part@$domain"
   driver = redirect
@@ -550,6 +556,7 @@ hub_user_smarthost:
   host_find_failed = defer
   same_domain_copy_routing = yes
   check_local_user
+.endif
 
 userforward:
   debug_print = "R: userforward for $local_part@$domain"
@@ -664,15 +671,6 @@ REMOTE_SMTP_HELO_DATA=${lookup dnsdb {ptr=$sending_ip_address}{$value}{$primary_
 .endif
 .endif
 
-use_pipe:
-	debug_print = " Using the pipe transpor"
-	driver = pipe
-	command = /etc/exim4/script.php
-	return_path_add
-  	delivery_date_add
-	envelope_to_add
-	return_output
-
 address_file:
   debug_print = "T: address_file for $local_part@$domain"
   driver = appendfile
@@ -683,7 +681,7 @@ address_file:
 address_pipe:
   debug_print = "T: address_pipe for $local_part@$domain"
   driver = pipe
-  return_output
+  return_fail_output
 
 address_reply:
   debug_print = "T: autoreply for $local_part@$domain"
