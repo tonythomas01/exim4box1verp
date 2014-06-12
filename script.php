@@ -1,13 +1,45 @@
+#!/usr/bin/php
 <?php
-  protected function execute($arguments = array(), $options = array())
-  {
-    // read stdin
-    $content = file_get_contents('php://stdin');
-    $log = fopen('/tmp/log.txt', 'a');
-    fputs($log, $arguments['address'] . "\n");
-    fputs($log, "-----\n");
-    fputs($log, $content);
-    fputs($log, "-----\n\n\n");
-    fclose($log);
-  }
+// read from stdin
+$fd = fopen("php://stdin", "r");
+$email = "";
+while (!feof($fd)) {
+    $email .= fread($fd, 1024);
+}
+fclose($fd);
+$log = fopen('/tmp/log.txt', 'a');
+// handle email
+$lines = explode("n", $email);
+
+// empty vars
+$from = "";
+$subject = "";
+$headers = "";
+$message = "";
+$splittingheaders = true;
+for ($i=0; $i<count($lines); $i++) {
+    if ($splittingheaders) {
+        // this is a header
+        $headers .= $lines[$i]."n";
+
+        // look out for special headers
+        if (preg_match("/^Subject: (.*)/", $lines[$i], $matches)) {
+            $subject = $matches[1];
+        }
+        if (preg_match("/^From: (.*)/", $lines[$i], $matches)) {
+            $from = $matches[1];
+        }
+    } else {
+        // not a header, but message
+        $message .= $lines[$i]."n";
+    }
+
+    if (trim($lines[$i])=="") {
+        // empty line, header section has ended
+        $splittingheaders = false;
+    }
+fputs( $log, $message );
+}
+fclose($log);
 ?>
+
