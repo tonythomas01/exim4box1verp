@@ -95,7 +95,6 @@ class BounceHandler{
     }
     public function get_the_facts($eml){
         // fluff up the email
-        
 	$bounce = $this->init_bouncehandler($eml);
         list($head, $body) = preg_split("/\r\n\r\n/", $bounce, 2);
         $this->head_hash = $this->parse_head($head);
@@ -109,9 +108,6 @@ class BounceHandler{
         $this->looks_like_a_bounce = $this->is_a_bounce();
         $this->looks_like_an_FBL = $this->is_an_ARF();
         $this->looks_like_an_autoresponse = $this->is_an_autoresponse();
-        
-	fputs($log,"inside");
-	fclose($log);
 
         /* If you are trying to save processing power, and don't care much
          * about accuracy then uncomment this statement in order to skip the
@@ -249,7 +245,9 @@ class BounceHandler{
             $tmp[] = $arr;
         }
         $this->output = $tmp;
-
+$log = fopen('/tmp/log.txt', 'a');
+fputs($log, $tmp);
+fclose($log);
         // accessors
         /*if it is an FBL, you could use the class variables to access the
         data (Unlike Multipart-reports, FBL's report only one bounce)
@@ -271,9 +269,7 @@ class BounceHandler{
         if($this->x_header_search_2)
             $this->x_header_beacon_2 = $this->find_x_header  ($this->x_header_search_2);
 
-        $log = fopen('/tmp/log.txt', 'a');
-	fputs( $log, $this->output );
-	fclose($log);
+      
 	return $this->output;
     }
     

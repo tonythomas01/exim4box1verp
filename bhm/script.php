@@ -1,24 +1,13 @@
 #!/usr/bin/php
 <?php
 // read from stdin
-$fd = fopen("php://stdin", "r");
-$eml = "";
-while (!feof($fd)) {
-    $eml .= fread($fd, 1024);
-}
-fclose($fd);
-require_once("bounce_driver.class.php");
-$bouncehandler = new Bouncehandler();
-$bounce = $eml;
+$mail_box = '{localhost:143/novalidate-cert}'; //imap example
+$mail_user = 'tonythomas01';
+$mail_pass = 'router69';
+$conn = imap_open($mail_box, $mail_user, $mail_pass) or die(imap_last_error());
+$num_msgs = imap_num_recent($conn);
 $log = fopen('/tmp/log.txt', 'a');
-$multiArray = $bouncehandler->get_the_facts($bounce);
- if(   !empty($multiArray[0]['action'])
-               && !empty($multiArray[0]['status'])
-               && !empty($multiArray[0]['recipient']) ){
-               fputs($log, "passed");
-            }
-            else {
-                fputs($log, "failed");
-       		}
+fputs( $log,$num_msgs );
 fclose($log);
+imap_close($conn);
 ?>
